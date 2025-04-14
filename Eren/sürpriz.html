@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Aşkitoma Sürpriz</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffe6f0, #fbeaff);
+      font-family: 'Comic Sans MS', cursive;
+      overflow: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 50px;
+      color: #ff3399;
+      margin-top: 80px;
+      animation: sparkle 2s infinite;
+      text-shadow: 2px 2px 5px #fff, 0 0 20px #ff66cc;
+    }
+
+    @keyframes sparkle {
+      0% { text-shadow: 0 0 10px #ff66cc; }
+      50% { text-shadow: 0 0 20px #ff99cc; }
+      100% { text-shadow: 0 0 10px #ff66cc; }
+    }
+
+    .main-btn {
+      display: block;
+      margin: 100px auto;
+      padding: 20px 40px;
+      font-size: 29px;
+      background-color: #ff66b2;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff99cc;
+      transition: all 0.3s ease;
+    }
+
+    .main-btn:hover {
+      transform: scale(1.05);
+      background-color: #ff4da6;
+    }
+
+    .main-btn::before {
+      content: "💖 ";
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background-color: white;
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+      z-index: 10;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      transition: 0.4s ease;
+    }
+
+    .popup.active {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .popup img {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 10px solid #ffccdd;
+      box-shadow: 0 0 20px #ff99cc;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/833/833472.png');
+      background-size: cover;
+    }
+
+    .popup p {
+      font-size: 22px;
+      color: #cc0066;
+      margin: 20px 0 0;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 16px;
+      background-color: #ff99cc;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .hearts {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .heart {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/833/833472.png');
+      background-size: cover;
+      animation: fall 6s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Aşkitoma Sürpriiizzz 💕</h1>
+
+  <button class="main-btn" onclick="showPopup()">Tıkla Bakalım Ne Varmış 💘</button>
+
+  <div class="popup" id="popup">
+    <img src="images/ben.jpeg" alt="Aşkım">
+    <p id="random-message"></p>
+    <button class="back-btn" onclick="hidePopup()">Anasayfaya Dön</button>
+  </div>
+
+  <div class="hearts" id="hearts"></div>
+
+  <audio id="clap" src="alkis/alkis.mp3"></audio>
+
+
+  <script>
+    const messages = [
+  "Bugün seni düşündüm ve düşündüm... Sonra bir kahve içtim, ama senin gibi birinin yanında olmak çok daha keyifli! ☕❤️ Yani, bir kahve de senin gibi tatlı olabilir mi?",
+  "Her gün biraz daha harika oluyorsun. Ama bugün tam 10 numara! Yorgun musun? Sana enerji verecek bir sevgi gönderdim! ⚡💪 Hadi bakalım, süper kahraman gibi!",
+  "Çok çalışıyorsun ama unutma, 'superstar' gibi parlıyorsun. O yüzden her yorgunluğun, bir ödülle geçecek! 🎤✨ Şu an bir ödül töreninde gibisin!",
+  "Yorgun olabilirsin ama senin gibi biri her zaman yükselir! 🚀💖 Bir bakmışsın, yeni bir başarı seni bekliyor. Hem, biraz uçarak gitmek ister misin?",
+  "Bugün seni daha çok seviyorum. Yarın mı? Daha da fazla! 💕 Ama unutma, seni sevmenin yasal bir sınırı yok!",
+  "Enerjin tükense de, sevginle beni aydınlatıyorsun. 🌟✨ Şimdi biraz rahatla ve günün tadını çıkar, çünkü sen çok özelsin! Hem, kim böyle enerjik bir insanı sevmez ki?",
+  "Her çalıştığın dakikada, daha fazla ilham ve başarı geliyor! 🌟💡 Tıpkı bir rock yıldızı gibi! Hadi ama, sahneye çıkma zamanı!",
+  "Çalışırken bir yandan harika olman nasıl mümkün? Seninle her şey kolay! 😂 Biraz eğlenmeye ne dersin? Hem 'işe odaklanma' oyunu yeni başlıyor!",
+  "Evet, belki biraz yorgunsun ama senin gücün sınırsız! ⚡💪 Hadi şimdi derin bir nefes al, çünkü seni bekleyen çok güzel şeyler var! Bu kadar güç, Batman’i bile şaşırtır!",
+  "Bugün biraz zorlayıcı olabilir ama unutma, seninle birlikte her şey çok daha kolay. Şimdi biraz güldürme zamanı! 😂 Hem, sana gülümsediğinde kimse duramaz!",
+  "Yorgun musun? O zaman sana bir teşekkür borçluyum çünkü her şeyin en iyisini seninle yaşıyorum! 🏆❤️ Seninle olmak, sabah kahvesinden bile daha keyifli!",
+  "Bütün bu yoğunluğa rağmen, sen hâlâ her anı özel kılıyorsun. 👑✨ Bir de bana 'ne kadar yakışıklı' demeyi unutma, valla başımı döndürüyorsun!",
+  "Yorgunluk sadece geçici, ama senin başarıların kalıcı. 📈👏 Hem senin gülüşün bile bir başarı sayılır!",
+  "Çok çalıştın, ama unutma en güzel şeyler dinlenmiş bir zihinle gelir. 😴🧠 Şimdi rahatla ve biraz enerji topla! Zihinsel olarak dinlenmeye başlayabilirsin!",
+  "Senin gibi harika biri, ne kadar çalışsa da başarılı olur! 🌟💼 Ama biraz eğlenceli bir mola verdiğinde daha da parlaklaşıyorsun! Hadi bakalım, çalışma değil, eğlenme vakti!",
+  "Dünyanın en harika insanı, çalıştıkça ışık saçar! 💡✨ Bu yorgunluk kısa süreli, ama başarı seninle!",
+  "Çok çalıştın, ama unutma en güzel şeyler dinlenmiş bir zihinle gelir! 😌🛋 Şimdi biraz zaman ayır ve eğlen!",
+  "Yorgun musun? O zaman sana bir teşekkür borçluyum çünkü her şeyin en iyisini seninle yaşıyorum! 😘 Şimdi biraz eğlenmeye ne dersin?",
+  "Bütün bu yoğunluğa rağmen, sen hâlâ her anı özel kılıyorsun. 💖 Bir de 'en yakışıklı' demeyi unutma, gözlerimi alıyoruuuuh!",
+  "Yorgunluk sadece geçici, ama senin başarıların kalıcı. 🏅💪 Hem de senin esprili yaklaşımın her şeyi çözüyor!"
+];
+
+    function showPopup() {
+      const popup = document.getElementById("popup");
+      const msg = document.getElementById("random-message");
+      const clap = document.getElementById("clap");
+      msg.innerText = messages[Math.floor(Math.random() * messages.length)];
+      popup.classList.add("active");
+      clap.currentTime = 0;
+      clap.play();
+    }
+
+    function hidePopup() {
+      document.getElementById("popup").classList.remove("active");
+    }
+
+    function createHearts() {
+      const heartsContainer = document.getElementById("hearts");
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDelay = (Math.random() * 5) + "s";
+        heart.style.width = heart.style.height = (20 + Math.random() * 20) + "px";
+        heartsContainer.appendChild(heart);
+      }
+    }
+
+    setInterval(createHearts, 500); // Sürekli kalp yağmuru
+  </script>
+
+</body>
+</html>
